@@ -56,8 +56,9 @@ BarchartScrapper/
 ├── contract_specs.py           # Contract specification mapper & multiplier lookup
 ├── exposure_engine.py          # Exposure calculation engine (GEX, VEX, VOEX, CHEX, Vanna Flow)
 ├── visualize_exposures.py      # Live visualization module (Matplotlib 2x3 Grid)
-├── coffee.py                   # Async Playwright options scraper
-├── futures_scrapper.py         # Async Playwright futures scraper
+├── options_scraper.py          # Async Playwright options scraper
+├── options_parser.py           # Generic options data parser
+├── futures_scraper.py          # Async Playwright futures scraper
 ├── run_pipeline.py             # Main interactive execution pipeline
 ├── pytest.ini                  # Strict pytest configuration & logging options
 └── requirements.txt            # Project dependencies
@@ -90,8 +91,10 @@ playwright install chromium
 
 ```bash
 python run_pipeline.py
+python run_pipeline.py --ticker SB
+python run_pipeline.py --ticker CL
 
-The script runs a continuous 15-minute background loop, fetching live market data and updating the interactive dashboard window.
+The default ticker is `KC`. The script runs a continuous 15-minute background loop, fetching live market data and updating the ticker-specific interactive dashboard.
 
 ## Running Test Suites
 

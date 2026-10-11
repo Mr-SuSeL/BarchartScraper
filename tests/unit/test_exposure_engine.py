@@ -4,8 +4,8 @@ import pandas as pd
 import pytest
 
 from exposure_engine import OptionExposureCalculator
-from futures_parser import get_latest_spot, parse_coffee_futures
-from coffee_parser import parse_coffee_options
+from futures_parser import get_latest_spot, parse_futures
+from options_parser import parse_options
 
 
 @pytest.fixture
@@ -99,12 +99,12 @@ def test_compute_exposures_uses_stateful_iv_deltas_between_runs(tmp_path):
     assert second_run['vanna_flow'].iloc[0] != pytest.approx(0.0, abs=1e-12)
 
 
-def test_coffee_profile_vex_uses_market_scale_and_is_plotted_as_vanna(
-    coffee_options_json_path, coffee_futures_json_path, tmp_path
+def test_market_profile_vex_uses_market_scale_and_is_plotted_as_vanna(
+    kc_options_json_path, kc_futures_json_path, tmp_path
 ):
-    print("[INFO] Parsowanie profilu kawy i pobieranie ceny spot...")
-    options = parse_coffee_options(str(coffee_options_json_path))
-    futures = parse_coffee_futures(str(coffee_futures_json_path))
+    print("[INFO] Parsowanie profilu rynku i pobieranie ceny spot...")
+    options = parse_options(str(kc_options_json_path))
+    futures = parse_futures(str(kc_futures_json_path))
     spot = get_latest_spot(futures)
 
     print("[INFO] Obliczanie ekspozycji VEX dla kontraktu KC...")
@@ -133,7 +133,7 @@ def test_coffee_profile_vex_uses_market_scale_and_is_plotted_as_vanna(
     figure = plot_exposures_dashboard(
         result,
         summary,
-        out_file=str(tmp_path / "coffee_vex.png"),
+        out_file=str(tmp_path / "kc_vex.png"),
     )
     try:
         titled_axes = [axis for axis in figure.axes if axis.get_title()]

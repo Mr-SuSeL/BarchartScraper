@@ -1,8 +1,16 @@
 import json
+from pathlib import Path
+
 import pandas as pd
 
+from contract_specs import get_contract_spec
 
-def parse_coffee_options(file_path: str) -> pd.DataFrame:
+
+def parse_options(file_path: str | Path | None = None, ticker: str = "KC") -> pd.DataFrame:
+    """Parse generic Barchart options data from a ticker-specific JSON file."""
+    spec = get_contract_spec(ticker)
+    if file_path is None:
+        file_path = Path(f"{spec.ticker.lower()}_options.json")
     with open(file_path, "r", encoding="utf-8") as f:
         data = json.load(f)
 
@@ -110,7 +118,7 @@ def parse_coffee_options(file_path: str) -> pd.DataFrame:
 
 
 if __name__ == "__main__":
-    df_options = parse_coffee_options("coffee_options.json")
+    df_options = parse_options()
     print(f"Pomyślnie załadowano {len(df_options)} aktywnych rekordów opcji.")
     if not df_options.empty:
         print(df_options[["strike", "option_type", "open_interest", "volume", "mid_price", "symbol"]].head(15))

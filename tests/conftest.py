@@ -11,27 +11,27 @@ if str(ROOT) not in sys.path:
 
 
 @pytest.fixture
-def coffee_futures_json_path():
-    return ROOT / 'coffee_futures.json'
+def kc_futures_json_path():
+    return ROOT / 'kc_futures.json'
 
 
 @pytest.fixture
-def coffee_options_json_path():
-    return ROOT / 'coffee_options.json'
+def kc_options_json_path():
+    return ROOT / 'kc_options.json'
 
 
 @pytest.fixture
-def coffee_options_csv_path():
-    return ROOT / 'coffee_options.csv'
+def kc_options_csv_path():
+    return ROOT / 'kc_options.csv'
 
 
 @pytest.fixture
-def coffee_futures_df(coffee_futures_json_path):
-    with coffee_futures_json_path.open('r', encoding='utf-8') as fh:
+def kc_futures_df(kc_futures_json_path):
+    with kc_futures_json_path.open('r', encoding='utf-8') as fh:
         payload = json.load(fh)
     return pd.DataFrame(payload)
 
 
 @pytest.fixture
-def coffee_options_df(coffee_options_csv_path):
-    return pd.read_csv(coffee_options_csv_path)
+def kc_options_df(kc_options_csv_path):
+    return pd.read_csv(kc_options_csv_path)

@@ -3,8 +3,22 @@ import json
 import pandas as pd
 from playwright.async_api import async_playwright
 
-async def scrape_options():
-    print("[+] Uruchamianie szybkiego Playwright (Opcje)...")
+from contract_specs import get_contract_spec
+
+
+def build_futures_url(ticker: str = "KC") -> str:
+    """Build the Barchart price-history URL for a supported contract."""
+    spec = get_contract_spec(ticker)
+    return (
+        f"https://www.barchart.com/futures/quotes/"
+        f"{spec.barchart_symbol}/price-history/historical"
+    )
+
+
+async def scrape_futures(ticker: str = "KC"):
+    spec = get_contract_spec(ticker)
+    ticker = spec.ticker
+    print("[+] Uruchamianie szybkiego Playwright (Futures)...")
     async with async_playwright() as p:
         browser = await p.chromium.launch(
             headless=True,
@@ -17,32 +31,31 @@ async def scrape_options():
         
         page = await context.new_page()
         
-        # BLOKOWANIE ŚMIECI (Obrazki, style, czcionki, media)
+        # BLOKOWANIE ŚMIECI
         await page.route("**/*.{png,jpg,jpeg,gif,svg,css,woff,woff2,ttf,eot,mp4,webp}", lambda route: route.abort())
 
         captured_json = []
 
         async def handle_response(response):
             url = response.url
-            if ("options" in url or "proxies" in url) and response.status == 200:
+            if ("historical" in url or "proxies" in url) and response.status == 200:
                 try:
                     data = await response.json()
                     if isinstance(data, dict) and "data" in data and data["data"]:
-                        print(f"[+] Przechwycono API Opcji!")
+                        print(f"[+] Przechwycono API Futures!")
                         captured_json.append(data)
                 except Exception:
                     pass
 
         page.on("response", handle_response)
 
-        target_url = "https://www.barchart.com/futures/quotes/KCZ26/options?mode=d&view=stacked"
-        print(f"[+] Ładowanie strony opcji...")
+        target_url = build_futures_url(ticker)
+        print(f"[+] Ładowanie strony futures...")
         
         try:
-            # Nie czekamy na pełny DOM, wchodzimy od razu
             await page.goto(target_url, wait_until="commit", timeout=30000)
             
-            # Czekamy pętlą tylko do momentu przechwycenia JSON-a (maksymalnie 12 sekund)
+            # Czekamy tylko na przechwycenie danych
             for _ in range(24):
                 if captured_json:
                     break
@@ -53,27 +66,19 @@ async def scrape_options():
         await browser.close()
 
         if captured_json:
-            res_data = captured_json[0]
-            with open("coffee_options.json", "w", encoding="utf-8") as f:
+            res_data = captured_json[-1]
+            with open(f"{ticker.lower()}_futures.json", "w", encoding="utf-8") as f:
                 json.dump(res_data, f, indent=4, ensure_ascii=False)
 
-            data_content = res_data.get("data", {})
-            rows = []
-            if isinstance(data_content, dict):
-                for option_type, items in data_content.items():
-                    if isinstance(items, list):
-                        for item in items:
-                            rows.append(item.get("raw", item))
-            elif isinstance(data_content, list):
-                for item in data_content:
-                    rows.append(item.get("raw", item))
+            data_content = res_data.get("data", [])
+            rows = [item.get("raw", item) for item in data_content if isinstance(data_content, list)]
 
             if rows:
                 df = pd.DataFrame(rows)
-                df.to_csv("coffee_options.csv", index=False)
-                print(f"[+] Pomyślnie pobrano {len(df)} opcji.")
+                df.to_csv(f"{ticker.lower()}_futures.csv", index=False)
+                print(f"[+] Pomyślnie pobrano {len(df)} rekordów futures.")
         else:
-            print("[-] Nie przechwycono opcji.")
+            print("[-] Nie przechwycono futures.")
 
 if __name__ == "__main__":
-    asyncio.run(scrape_options())
+    asyncio.run(scrape_futures())

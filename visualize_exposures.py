@@ -1,20 +1,53 @@
 import matplotlib.pyplot as plt
 import matplotlib.gridspec as gridspec
+from matplotlib.colors import to_rgba
 import numpy as np
 import pandas as pd
-from coffee_parser import parse_coffee_options
+from contract_specs import get_contract_spec
+from options_parser import parse_options
 from exposure_engine import OptionExposureCalculator
 
 plt.style.use("dark_background")
 plt.ion()
 
+
+def _get_strike_bar_width(strikes):
+    """Choose a bar width from the smallest positive gap in the strikes."""
+    unique_strikes = np.sort(np.asarray(strikes, dtype=float))
+    unique_strikes = np.unique(unique_strikes[np.isfinite(unique_strikes)])
+    strike_diffs = np.diff(unique_strikes)
+    positive_diffs = strike_diffs[strike_diffs > 0]
+    if positive_diffs.size:
+        return float(np.min(positive_diffs) * 0.7)
+    return 0.5
+
+
+def _set_strike_xlim(ax, strikes, bar_width):
+    """Pad the x-axis for the strike range without clipping the outer bars."""
+    if len(strikes) == 0:
+        return
+
+    min_strike = float(np.min(strikes))
+    max_strike = float(np.max(strikes))
+    strike_range = max_strike - min_strike
+    # The range-based margin suits dense chains; the bar-based minimum also
+    # keeps wide bars fully visible when only a few strikes are available.
+    padding = max(strike_range * 0.05, bar_width * 0.55)
+    ax.set_xlim(min_strike - padding, max_strike + padding)
+
+
 def plot_exposures_dashboard(
     df_results: pd.DataFrame,
     summary: dict,
-    symbol: str = "Coffee C (KC)",
-    out_file: str = "coffee_exposures_dashboard.png",
+    symbol: str | None = None,
+    out_file: str | None = None,
     fig=None,
+    ticker: str = "KC",
 ):
+    spec = get_contract_spec(ticker)
+    ticker = spec.ticker
+    symbol = symbol or f"{spec.name} ({ticker})"
+    out_file = out_file or f"{ticker.lower()}_exposures_dashboard.png"
     if fig is None or not plt.fignum_exists(fig.number):
         fig = plt.figure(figsize=(20, 11))
         fig.canvas.manager.set_window_title(f"Options Exposures — {symbol}")
@@ -55,6 +88,8 @@ def plot_exposures_dashboard(
     min_strike = spot_price * 0.75
     max_strike = spot_price * 1.25
     df_filtered = df_agg[(df_agg["strike"] >= min_strike) & (df_agg["strike"] <= max_strike)].copy()
+    strikes = df_filtered["strike"].to_numpy(dtype=float)
+    bar_width = _get_strike_bar_width(strikes)
 
     iv_str = f"+{delta_iv_pct:.2f}%" if delta_iv_pct >= 0 else f"{delta_iv_pct:.2f}%"
     fig.suptitle(
@@ -79,9 +114,20 @@ def plot_exposures_dashboard(
         strikes = df_filtered["strike"]
         # Zabezpieczenie w razie braku kolumny w początkowym etapie testów
         values = (df_filtered[col] if col in df_filtered else np.zeros(len(strikes))) / scale_factor
-        colors = ["#26a69a" if val >= 0 else "#ef5350" for val in values]
+        colors = [
+            to_rgba("#26a69a" if val >= 0 else "#ef5350", alpha=0.7)
+            for val in values
+        ]
 
-        ax.bar(strikes, values, width=1.8, color=colors, alpha=0.85, edgecolor="none")
+        ax.bar(
+            strikes,
+            values,
+            width=bar_width,
+            color=colors,
+            edgecolor=(0.23, 0.23, 0.23, 0.65),
+            linewidth=0.4,
+        )
+        _set_strike_xlim(ax, strikes, bar_width)
         ax.axvline(x=spot_price, color="#ffb74d", linestyle="--", linewidth=1.5, label=f"Spot: {spot_price:.2f}")
         ax.axhline(0, color="#666666", linewidth=0.8, linestyle="-")
 
@@ -108,8 +154,21 @@ def plot_exposures_dashboard(
     color_div = "#ff7043"
     ax_div.set_ylabel("Local ΔIV [pp]", color=color_div, fontsize=9, labelpad=7)
 
-    div_colors = ["#26a69a" if val >= 0 else "#ef5350" for val in delta_iv_pp]
-    ax_div.bar(strikes, delta_iv_pp, width=1.2, color=div_colors, alpha=0.45, label="Real ΔIV Shift (pp)")
+    div_colors = [
+        to_rgba("#26a69a" if val >= 0 else "#ef5350", alpha=0.6)
+        for val in delta_iv_pp
+    ]
+    ax_div.bar(
+        strikes,
+        delta_iv_pp,
+        width=bar_width,
+        color=div_colors,
+        edgecolor=(0.23, 0.23, 0.23, 0.65),
+        linewidth=0.4,
+        label="Real ΔIV Shift (pp)",
+    )
+    _set_strike_xlim(ax_iv, strikes, bar_width)
+    _set_strike_xlim(ax_div, strikes, bar_width)
     ax_div.tick_params(axis="y", labelcolor=color_div)
 
     ax_iv.axvline(x=spot_price, color="#ffb74d", linestyle="--", linewidth=1.5)
@@ -129,15 +188,20 @@ def plot_exposures_dashboard(
     return fig
 
 if __name__ == "__main__":
-    df_raw = parse_coffee_options("coffee_options.json")
+    spec = get_contract_spec("KC")
+    df_raw = parse_options(ticker=spec.ticker)
 
     if not df_raw.empty:
         CURRENT_SPOT = 286.95
         TIME_TO_EXPIRY = 0.15
 
-        calc = OptionExposureCalculator(spot_price=CURRENT_SPOT, multiplier=37500.0, cache_dir="cache")
-        df_results = calc.compute_exposures(df_raw, time_to_expiry_years=TIME_TO_EXPIRY, ticker="KC")
+        calc = OptionExposureCalculator(
+            spot_price=CURRENT_SPOT, multiplier=spec.multiplier, cache_dir="cache"
+        )
+        df_results = calc.compute_exposures(
+            df_raw, time_to_expiry_years=TIME_TO_EXPIRY, ticker=spec.ticker
+        )
         summary = calc.get_summary(df_results)
 
-        fig = plot_exposures_dashboard(df_results, summary=summary)
+        fig = plot_exposures_dashboard(df_results, summary=summary, ticker=spec.ticker)
         plt.show(block=True)

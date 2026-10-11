@@ -183,7 +183,7 @@ class OptionExposureCalculator:
     @classmethod
     def print_exposure_report(cls, summary: dict, df_results: pd.DataFrame, top_n: int = 10):
         print("\n" + "=" * 130)
-        print("=== PODSUMOWANIE PORTFELA DLA KAWY (KC) ===")
+        print("=== PODSUMOWANIE EKSPOZYCJI OPCJI ===")
         print("=" * 130)
 
         for key, val in summary.items():
@@ -202,19 +202,23 @@ class OptionExposureCalculator:
 
 
 if __name__ == "__main__":
-    from coffee_parser import parse_coffee_options
+    from contract_specs import get_contract_spec
+    from options_parser import parse_options
 
-    df_raw = parse_coffee_options("coffee_options.json")
+    spec = get_contract_spec("KC")
+    df_raw = parse_options(ticker=spec.ticker)
 
     if not df_raw.empty:
         CURRENT_SPOT = 285.15
         TIME_TO_EXPIRY = 0.15
         
-        calc = OptionExposureCalculator(spot_price=CURRENT_SPOT, multiplier=37500.0, cache_dir="cache")
+        calc = OptionExposureCalculator(
+            spot_price=CURRENT_SPOT, multiplier=spec.multiplier, cache_dir="cache"
+        )
         df_results = calc.compute_exposures(
             df_raw,
             time_to_expiry_years=TIME_TO_EXPIRY,
-            ticker="KC"
+            ticker=spec.ticker
         )
         
         summary = calc.get_summary(df_results)

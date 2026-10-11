@@ -64,32 +64,33 @@ matplotlib.use("Agg", force=True)
 import matplotlib.pyplot as plt
 
 import run_pipeline
-from futures_parser import get_latest_spot, parse_coffee_futures
+from futures_parser import get_latest_spot, parse_futures
 
 
 def test_pipeline_refresh_detects_iv_change_and_updates_vanna_flow(monkeypatch, tmp_path):
     print("[INFO] Kopiowanie cache'owanych danych futures i opcji...")
-    for filename in ("coffee_futures.json", "coffee_options.json"):
+    for filename in ("kc_futures.json", "kc_options.json"):
         shutil.copy2(ROOT / filename, tmp_path / filename)
     monkeypatch.chdir(tmp_path)
 
-    async def fake_scrape():
+    async def fake_scrape(ticker="KC"):
+        assert ticker == "KC"
         return None
 
     monkeypatch.setattr(run_pipeline, "scrape_options", fake_scrape)
     monkeypatch.setattr(run_pipeline, "scrape_futures", fake_scrape)
 
-    original_parse_options = run_pipeline.parse_coffee_options
+    original_parse_options = run_pipeline.parse_options
     parse_cycles = 0
 
-    def parse_options_with_cycle_iv(path):
+    def parse_options_with_cycle_iv(path=None, ticker="KC"):
         nonlocal parse_cycles
-        options = original_parse_options(path)
+        options = original_parse_options(path, ticker=ticker)
         parse_cycles += 1
         options["iv"] = 0.20 + (0.02 if parse_cycles > 1 else 0.0)
         return options
 
-    monkeypatch.setattr(run_pipeline, "parse_coffee_options", parse_options_with_cycle_iv)
+    monkeypatch.setattr(run_pipeline, "parse_options", parse_options_with_cycle_iv)
 
     plot_summaries = []
     plot_flow_bars = []
@@ -109,7 +110,7 @@ def test_pipeline_refresh_detects_iv_change_and_updates_vanna_flow(monkeypatch, 
 
     monkeypatch.setattr(run_pipeline, "plot_exposures_dashboard", capture_plot)
 
-    futures = parse_coffee_futures(str(tmp_path / "coffee_futures.json"))
+    futures = parse_futures(str(tmp_path / "kc_futures.json"))
     spot = get_latest_spot(futures)
     assert spot > 0
     state_file = tmp_path / "cache" / "iv_state_KC.json"
@@ -139,7 +140,7 @@ def test_pipeline_refresh_detects_iv_change_and_updates_vanna_flow(monkeypatch, 
         assert plot_summaries[1]["net_vanna_flow"] != pytest.approx(0.0)
         assert plot_flow_bars[1]
         assert any(value != pytest.approx(0.0) for value in plot_flow_bars[1])
-        assert (tmp_path / "coffee_exposures_dashboard.png").exists()
+        assert (tmp_path / "kc_exposures_dashboard.png").exists()
     finally:
         if figure is not None:
             plt.close(figure)

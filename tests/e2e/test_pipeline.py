@@ -60,7 +60,7 @@ import run_pipeline
 
 def test_run_single_cycle_uses_cached_fixture_data(monkeypatch, tmp_path):
     print("[INFO] Kopiowanie plików fixture do katalogu tymczasowego...")
-    for filename in ("coffee_futures.json", "coffee_options.json"):
+    for filename in ("kc_futures.json", "kc_options.json"):
         shutil.copy2(ROOT / filename, tmp_path / filename)
 
     print("[INFO] Przygotowanie atrap scrapingu i wykresu...")
@@ -68,10 +68,12 @@ def test_run_single_cycle_uses_cached_fixture_data(monkeypatch, tmp_path):
 
     calls = {"options": 0, "futures": 0}
 
-    async def fake_scrape_options():
+    async def fake_scrape_options(ticker="KC"):
+        assert ticker == "KC"
         calls["options"] += 1
 
-    async def fake_scrape_futures():
+    async def fake_scrape_futures(ticker="KC"):
+        assert ticker == "KC"
         calls["futures"] += 1
 
     monkeypatch.setattr(run_pipeline, "scrape_options", fake_scrape_options)
@@ -95,8 +97,8 @@ def test_run_single_cycle_uses_cached_fixture_data(monkeypatch, tmp_path):
     assert calls == {"options": 1, "futures": 1}
 
     print("[INFO] Parsowanie lokalnych danych futures i opcji...")
-    df_futures = run_pipeline.parse_coffee_futures("coffee_futures.json")
-    df_options = run_pipeline.parse_coffee_options("coffee_options.json")
+    df_futures = run_pipeline.parse_futures("kc_futures.json")
+    df_options = run_pipeline.parse_options("kc_options.json")
 
     assert len(df_futures) > 0
     assert len(df_options) > 0
@@ -108,7 +110,7 @@ def test_run_single_cycle_uses_cached_fixture_data(monkeypatch, tmp_path):
     print("[INFO] Obliczanie ekspozycji opcji...")
     calc = run_pipeline.OptionExposureCalculator(
         spot_price=spot_price,
-        multiplier=37500.0,
+        multiplier=run_pipeline.get_contract_spec("KC").multiplier,
         cache_dir="cache",
     )
     df_results = calc.compute_exposures(df_options, time_to_expiry_years=0.15, ticker="KC")

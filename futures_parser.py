@@ -1,9 +1,17 @@
 import json
+from pathlib import Path
+
 import pandas as pd
 
 
-def parse_coffee_futures(file_path: str) -> pd.DataFrame:
+from contract_specs import get_contract_spec
+
+
+def parse_futures(file_path: str | Path | None = None, ticker: str = "KC") -> pd.DataFrame:
     """Parsuje plik JSON z Barcharta zawierający historię kontraktu futures (OHLCV)."""
+    spec = get_contract_spec(ticker)
+    if file_path is None:
+        file_path = Path(f"{spec.ticker.lower()}_futures.json")
     with open(file_path, "r", encoding="utf-8") as f:
         data = json.load(f)
 
@@ -88,7 +96,7 @@ def get_latest_spot(df_futures: pd.DataFrame) -> float:
 
 
 if __name__ == "__main__":
-    df_fut = parse_coffee_futures("coffee_futures.json")
+    df_fut = parse_futures()
     print(f"Pomyślnie załadowano {len(df_fut)} rekordów OHLCV.")
     if not df_fut.empty:
         print(df_fut.head(10))

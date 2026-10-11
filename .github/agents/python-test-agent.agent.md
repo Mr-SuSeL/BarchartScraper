@@ -13,7 +13,7 @@ Jesteś starszym inżynierem QA i deweloperem Python. Twoim zadaniem jest analiz
    - Testy integracyjne/E2E (np. dla pipeline'u) do `tests/e2e/`
 2. **Framework:** Używaj biblioteki `pytest`.
 3. **Mockowanie i Dane:** 
-   - Dla testów parserów i scrapingu (`futures_parser.py`, `coffee_parser.py`) mockuj odpowiedzi sieciowe lub korzystaj z istniejących w projekcie plików lokalnych (`coffee_futures.json`, `coffee_options.csv`).
+   - Dla testów parserów i scrapingu (`futures_parser.py`, `options_parser.py`) mockuj odpowiedzi sieciowe lub korzystaj z istniejących w projekcie plików lokalnych, np. `kc_futures.json` i `kc_options.csv`.
    - Dla modułów matematycznych/wyceny (`black76.py`, `exposure_engine.py`) twórz precyzyjne testy matematyczne wartości brzegowych (np. vol=0, TTM=0, deep ITM/OTM).
 4. **Struktura pliku conftest.py:** Jeśli katalog `tests/` nie istnieje, utwórz w nim podstawowy plik `tests/conftest.py` z fixture'ami wczytującymi przykładowe pliki JSON/CSV z głównego folderu.
 
