@@ -1,17 +1,11 @@
-# Repository Description
-
-> **Real-time Options Microstructure & Dealer Exposure Engine (GEX, VEX, VOEX, CHEX) for Commodity & Index Futures. Features async Playwright Barchart scraper, Black-76 quantitative pricing, live Matplotlib dashboard, and custom GitHub Copilot agentic QA framework.**
-
----
-
-# Ares Analytics — Options Microstructure & Dealer Exposure Engine
+# Greeks Analytics — Options Microstructure & Dealer Exposure Engine
 
 ![Python Version](https://img.shields.io/badge/python-3.12%2B-blue.svg)
 ![License](https://img.shields.io/badge/license-MIT-green.svg)
 ![Framework](https://img.shields.io/badge/testing-pytest-orange.svg)
 ![AI Agents](https://img.shields.io/badge/agentic-GitHub%20Copilot-purple.svg)
 
-**Ares Analytics** is an advanced options microstructure analysis engine and dealer exposure profiler (GEX, VEX, VOEX, CHEX) tailored for commodity and index futures (Coffee, Sugar, Cocoa, Crude Oil, S&P 500). The system combines automated live data retrieval via Playwright, quantitative Black-76 options pricing, and a multi-agent AI software factory powered by custom VS Code Copilot Agents.
+**Greeks Analytics** is an advanced options microstructure analysis engine and dealer exposure profiler (GEX, VEX, VOEX, CHEX) tailored for commodity and index futures (Coffee, Sugar, Cocoa, Crude Oil, S&P 500). The system combines automated live data retrieval via Playwright, quantitative Black-76 options pricing, and a multi-agent AI software factory powered by custom VS Code Copilot Agents.
 
 ---
 
