@@ -83,12 +83,12 @@ The repository's custom agents are defined in `.github/agents/`:
 
 | Agent | Role |
 | :--- | :--- |
-| `@python-test-agent` | Creates and maintains unit, integration, and end-to-end tests with `pytest`. |
-| `@quant-engineer` | Works on Black-76 pricing, Greeks, exposure calculations, and quantitative visualization. |
-| `@architect-agent` | Guides architecture refactors, ticker-agnostic interfaces, and project file organization. |
-| `@ui-ux-agent` | Improves Matplotlib responsiveness, strike-based dynamic `bar_width`, and dark-mode presentation. |
-| `@readme-updater` | Keeps the repository README, architecture description, and usage documentation current. |
-| `@math-auditor` | Audits Black-76 formulas, analytical derivatives, exposure definitions, and units. |
+| `@python-test-agent` | Automates unit and end-to-end testing with `pytest`. |
+| `@quant-engineer` | Black-76 pricing, Greeks, and exposure engine (GEX, VEX, VOEX, CHEX). |
+| `@math-auditor` | Audits mathematical formulas and analytical derivatives using finite differences. |
+| `@architect-agent` | Multi-market architecture (`--ticker`) and `data/` / `dashboards/` directory structure. |
+| `@ui-ux-agent` | Matplotlib chart responsiveness, dynamic `bar_width`, and dark theme. |
+| `@readme-updater` | Keeps `README.md` synchronized with the source code. |
 
 ## Dashboard
 
