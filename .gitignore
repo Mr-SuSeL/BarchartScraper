@@ -1,0 +1,16 @@
+# Środowisko wirtualne i biblioteki
+.venv/
+venv/
+ENV/
+
+# Pamięć podręczna Pythona i Pytest
+__pycache__/
+*.pyc
+.pytest_cache/
+
+# Cache danych i wygenerowane wykresy
+cache/
+*.png
+
+# Ustawienia lokalne IDE
+.vscode/
