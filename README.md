@@ -7,6 +7,8 @@
 
 **Greeks Analytics** is an options microstructure analysis and dealer-exposure engine for commodity and index futures. It retrieves Barchart options and futures data, calculates Black-76 prices and Greeks, and presents exposure profiles for Coffee, Sugar, Cocoa, Crude Oil, and E-mini S&P 500 futures.
 
+![Greeks Analytics Dashboard](img/img1.png)
+
 ## Key Features
 
 - **Live market data:** Playwright-based scrapers retrieve options-chain and futures-history data.
