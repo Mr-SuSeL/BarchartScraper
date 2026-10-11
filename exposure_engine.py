@@ -16,7 +16,7 @@ class OptionExposureCalculator:
         spot_price: float,
         risk_free_rate: float = 0.045,
         multiplier: Optional[float] = None,
-        cache_dir: str = "cache",
+        cache_dir: str = "data",
     ):
         self.spot = spot_price
         self.r = risk_free_rate
@@ -131,7 +131,9 @@ class OptionExposureCalculator:
 
         self.last_weighted_iv = weighted_iv
 
-        delta_iv_map = self._update_iv_state_per_strike(df, weighted_iv, ticker=ticker)
+        delta_iv_map = self._update_iv_state_per_strike(
+            df, weighted_iv, ticker=spec.ticker
+        )
 
         for idx, row in df.iterrows():
             strike_str = f"{float(row['strike']):.2f}"
@@ -213,7 +215,7 @@ if __name__ == "__main__":
         TIME_TO_EXPIRY = 0.15
         
         calc = OptionExposureCalculator(
-            spot_price=CURRENT_SPOT, multiplier=spec.multiplier, cache_dir="cache"
+            spot_price=CURRENT_SPOT, multiplier=spec.multiplier, cache_dir="data"
         )
         df_results = calc.compute_exposures(
             df_raw,

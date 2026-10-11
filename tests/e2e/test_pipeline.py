@@ -60,8 +60,10 @@ import run_pipeline
 
 def test_run_single_cycle_uses_cached_fixture_data(monkeypatch, tmp_path):
     print("[INFO] Kopiowanie plików fixture do katalogu tymczasowego...")
+    data_dir = tmp_path / "data"
+    data_dir.mkdir()
     for filename in ("kc_futures.json", "kc_options.json"):
-        shutil.copy2(ROOT / filename, tmp_path / filename)
+        shutil.copy2(ROOT / "data" / filename, data_dir / filename)
 
     print("[INFO] Przygotowanie atrap scrapingu i wykresu...")
     monkeypatch.chdir(tmp_path)
@@ -97,8 +99,8 @@ def test_run_single_cycle_uses_cached_fixture_data(monkeypatch, tmp_path):
     assert calls == {"options": 1, "futures": 1}
 
     print("[INFO] Parsowanie lokalnych danych futures i opcji...")
-    df_futures = run_pipeline.parse_futures("kc_futures.json")
-    df_options = run_pipeline.parse_options("kc_options.json")
+    df_futures = run_pipeline.parse_futures("data/kc_futures.json")
+    df_options = run_pipeline.parse_options("data/kc_options.json")
 
     assert len(df_futures) > 0
     assert len(df_options) > 0
@@ -111,7 +113,7 @@ def test_run_single_cycle_uses_cached_fixture_data(monkeypatch, tmp_path):
     calc = run_pipeline.OptionExposureCalculator(
         spot_price=spot_price,
         multiplier=run_pipeline.get_contract_spec("KC").multiplier,
-        cache_dir="cache",
+        cache_dir="data",
     )
     df_results = calc.compute_exposures(df_options, time_to_expiry_years=0.15, ticker="KC")
     summary = calc.get_summary(df_results)

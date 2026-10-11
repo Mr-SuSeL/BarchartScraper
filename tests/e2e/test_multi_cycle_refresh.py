@@ -69,8 +69,10 @@ from futures_parser import get_latest_spot, parse_futures
 
 def test_pipeline_refresh_detects_iv_change_and_updates_vanna_flow(monkeypatch, tmp_path):
     print("[INFO] Kopiowanie cache'owanych danych futures i opcji...")
+    data_dir = tmp_path / "data"
+    data_dir.mkdir()
     for filename in ("kc_futures.json", "kc_options.json"):
-        shutil.copy2(ROOT / filename, tmp_path / filename)
+        shutil.copy2(ROOT / "data" / filename, data_dir / filename)
     monkeypatch.chdir(tmp_path)
 
     async def fake_scrape(ticker="KC"):
@@ -110,10 +112,10 @@ def test_pipeline_refresh_detects_iv_change_and_updates_vanna_flow(monkeypatch, 
 
     monkeypatch.setattr(run_pipeline, "plot_exposures_dashboard", capture_plot)
 
-    futures = parse_futures(str(tmp_path / "kc_futures.json"))
+    futures = parse_futures(str(data_dir / "kc_futures.json"))
     spot = get_latest_spot(futures)
     assert spot > 0
-    state_file = tmp_path / "cache" / "iv_state_KC.json"
+    state_file = data_dir / "iv_state_KC.json"
 
     print("[INFO] Uruchamianie pierwszego cyklu z IV bazową...")
     figure = asyncio.run(run_pipeline.run_single_cycle(None))
@@ -140,7 +142,7 @@ def test_pipeline_refresh_detects_iv_change_and_updates_vanna_flow(monkeypatch, 
         assert plot_summaries[1]["net_vanna_flow"] != pytest.approx(0.0)
         assert plot_flow_bars[1]
         assert any(value != pytest.approx(0.0) for value in plot_flow_bars[1])
-        assert (tmp_path / "kc_exposures_dashboard.png").exists()
+        assert (tmp_path / "dashboards" / "kc_exposures_dashboard.png").exists()
     finally:
         if figure is not None:
             plt.close(figure)

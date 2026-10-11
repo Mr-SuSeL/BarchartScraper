@@ -1,3 +1,5 @@
+from pathlib import Path
+
 import matplotlib.pyplot as plt
 import matplotlib.gridspec as gridspec
 from matplotlib.colors import to_rgba
@@ -40,14 +42,15 @@ def plot_exposures_dashboard(
     df_results: pd.DataFrame,
     summary: dict,
     symbol: str | None = None,
-    out_file: str | None = None,
+    out_file: str | Path | None = None,
     fig=None,
     ticker: str = "KC",
 ):
     spec = get_contract_spec(ticker)
     ticker = spec.ticker
     symbol = symbol or f"{spec.name} ({ticker})"
-    out_file = out_file or f"{ticker.lower()}_exposures_dashboard.png"
+    out_file = Path(out_file or Path("dashboards") / f"{ticker.lower()}_exposures_dashboard.png")
+    out_file.parent.mkdir(parents=True, exist_ok=True)
     if fig is None or not plt.fignum_exists(fig.number):
         fig = plt.figure(figsize=(20, 11))
         fig.canvas.manager.set_window_title(f"Options Exposures — {symbol}")
@@ -196,7 +199,7 @@ if __name__ == "__main__":
         TIME_TO_EXPIRY = 0.15
 
         calc = OptionExposureCalculator(
-            spot_price=CURRENT_SPOT, multiplier=spec.multiplier, cache_dir="cache"
+            spot_price=CURRENT_SPOT, multiplier=spec.multiplier, cache_dir="data"
         )
         df_results = calc.compute_exposures(
             df_raw, time_to_expiry_years=TIME_TO_EXPIRY, ticker=spec.ticker

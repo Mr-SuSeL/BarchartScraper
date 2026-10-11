@@ -1,7 +1,12 @@
+import shutil
+from pathlib import Path
+
 import pytest
 
 from contract_specs import get_contract_spec
 from futures_scraper import build_futures_url
+from futures_parser import parse_futures
+from options_parser import parse_options
 from options_scraper import build_options_url
 from run_pipeline import parse_args
 
@@ -26,3 +31,18 @@ def test_cli_defaults_to_kc_and_accepts_ticker_case_insensitively():
 def test_cli_rejects_unsupported_ticker():
     with pytest.raises(SystemExit):
         parse_args(["--ticker", "XX"])
+
+
+def test_parsers_default_to_market_files_under_data_directory(monkeypatch, tmp_path):
+    data_dir = tmp_path / "data"
+    data_dir.mkdir()
+    fixture_data_dir = Path(__file__).resolve().parents[2] / "data"
+    for filename in ("kc_options.json", "kc_futures.json"):
+        shutil.copy2(fixture_data_dir / filename, data_dir / filename)
+    monkeypatch.chdir(tmp_path)
+
+    options = parse_options()
+    futures = parse_futures()
+
+    assert not options.empty
+    assert not futures.empty

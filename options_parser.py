@@ -10,7 +10,7 @@ def parse_options(file_path: str | Path | None = None, ticker: str = "KC") -> pd
     """Parse generic Barchart options data from a ticker-specific JSON file."""
     spec = get_contract_spec(ticker)
     if file_path is None:
-        file_path = Path(f"{spec.ticker.lower()}_options.json")
+        file_path = Path("data") / f"{spec.ticker.lower()}_options.json"
     with open(file_path, "r", encoding="utf-8") as f:
         data = json.load(f)
 

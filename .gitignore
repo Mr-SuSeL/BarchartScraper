@@ -8,12 +8,19 @@ __pycache__/
 *.pyc
 .pytest_cache/
 
-# Cache danych i wygenerowane wykresy
-cache/
-*.png
+# Wygenerowane dane, stan IV i dashboardy
+/data/*
+/dashboards/
+/cache/
 
 # Ustawienia lokalne IDE
 .vscode/
 
-.csv
-.json
+*.csv
+*.json
+
+# Śledzone dane wejściowe wykorzystywane jako fixture testowe
+!/data/kc_futures.json
+!/data/kc_options.json
+!/data/kc_futures.csv
+!/data/kc_options.csv

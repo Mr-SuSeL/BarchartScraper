@@ -47,7 +47,8 @@ BarchartScrapper/
 │       ├── python-test-agent.agent.md
 │       ├── quant-engineer.agent.md
 │       └── math-auditor.agent.md
-├── cache/                      # Persistent IV states and market data cache
+├── data/                       # Market JSON/CSV and persistent iv_state_{ticker}.json
+├── dashboards/                 # Generated exposure charts
 ├── tests/
 │   ├── unit/                   # Unit tests (black76, exposure, multi-market)
 │   ├── e2e/                    # E2E tests (pipeline execution, multi-cycle refresh)

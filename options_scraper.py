@@ -71,7 +71,9 @@ async def scrape_options(ticker: str = "KC"):
 
         if captured_json:
             res_data = captured_json[0]
-            options_file = Path(f"{ticker.lower()}_options.json")
+            data_dir = Path("data")
+            data_dir.mkdir(parents=True, exist_ok=True)
+            options_file = data_dir / f"{ticker.lower()}_options.json"
             with options_file.open("w", encoding="utf-8") as f:
                 json.dump(res_data, f, indent=4, ensure_ascii=False)
 
@@ -88,7 +90,7 @@ async def scrape_options(ticker: str = "KC"):
 
             if rows:
                 df = pd.DataFrame(rows)
-                df.to_csv(f"{ticker.lower()}_options.csv", index=False)
+                df.to_csv(data_dir / f"{ticker.lower()}_options.csv", index=False)
                 print(f"[+] Pomyślnie pobrano {len(df)} opcji.")
         else:
             print("[-] Nie przechwycono opcji.")

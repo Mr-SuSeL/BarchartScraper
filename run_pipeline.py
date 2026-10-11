@@ -36,7 +36,7 @@ async def run_single_cycle(fig_handle, ticker="KC"):
         return fig_handle
 
     calc = OptionExposureCalculator(
-        spot_price=spot_price, multiplier=spec.multiplier, cache_dir="cache"
+        spot_price=spot_price, multiplier=spec.multiplier, cache_dir="data"
     )
     df_results = calc.compute_exposures(df_options, time_to_expiry_years=0.15, ticker=ticker)
     summary = calc.get_summary(df_results)

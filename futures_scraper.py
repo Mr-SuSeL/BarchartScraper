@@ -1,5 +1,7 @@
 import asyncio
 import json
+from pathlib import Path
+
 import pandas as pd
 from playwright.async_api import async_playwright
 
@@ -67,7 +69,9 @@ async def scrape_futures(ticker: str = "KC"):
 
         if captured_json:
             res_data = captured_json[-1]
-            with open(f"{ticker.lower()}_futures.json", "w", encoding="utf-8") as f:
+            data_dir = Path("data")
+            data_dir.mkdir(parents=True, exist_ok=True)
+            with (data_dir / f"{ticker.lower()}_futures.json").open("w", encoding="utf-8") as f:
                 json.dump(res_data, f, indent=4, ensure_ascii=False)
 
             data_content = res_data.get("data", [])
@@ -75,7 +79,7 @@ async def scrape_futures(ticker: str = "KC"):
 
             if rows:
                 df = pd.DataFrame(rows)
-                df.to_csv(f"{ticker.lower()}_futures.csv", index=False)
+                df.to_csv(data_dir / f"{ticker.lower()}_futures.csv", index=False)
                 print(f"[+] Pomyślnie pobrano {len(df)} rekordów futures.")
         else:
             print("[-] Nie przechwycono futures.")
