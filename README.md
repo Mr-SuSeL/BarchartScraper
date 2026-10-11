@@ -65,17 +65,36 @@ pip install pandas numpy matplotlib playwright pytest
 playwright install chromium
 ```
 
-Run the live pipeline with a supported ticker:
+### Running the application
+
+Run `run_pipeline.py` for the default Coffee market (`KC`), or select a
+supported market with `--ticker`:
 
 ```bash
+# Coffee (default)
+python run_pipeline.py
 python run_pipeline.py --ticker KC
+
+# Sugar
 python run_pipeline.py --ticker SB
+
+# Cocoa
 python run_pipeline.py --ticker CC
+
+# Crude Oil
 python run_pipeline.py --ticker CL
+
+# S&P 500 futures
 python run_pipeline.py --ticker ES
 ```
 
-The default ticker is `KC` if `--ticker` is omitted. The pipeline runs continuously and refreshes data and the dashboard every 15 minutes. Stop it with `Ctrl+C`.
+The default market is `KC` (Coffee). Ticker values are case-insensitive, so
+`--ticker cl` and `--ticker CL` select the same market. The application runs a
+continuous refresh loop that retrieves market data every 15 minutes. It saves
+the options and futures JSON files under `data/` (for example,
+`data/cl_options.json` and `data/cl_futures.json`) and writes the dashboard
+image under `dashboards/` (for example,
+`dashboards/cl_exposures_dashboard.png`). Press `Ctrl+C` to stop the loop.
 
 ## AI Agent Team
 
