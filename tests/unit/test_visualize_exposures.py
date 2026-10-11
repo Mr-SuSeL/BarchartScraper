@@ -45,6 +45,8 @@ def test_dashboard_bars_scale_to_strike_spacing_and_keep_padding(
         out_file=str(tmp_path / "dashboard.png"),
     )
     try:
+        assert figure._suptitle is not None
+        assert figure._suptitle.get_text().startswith("Greeks Analytics:")
         axes_by_title = {axis.get_title(): axis for axis in figure.axes if axis.get_title()}
         for prefix in ("GEX", "VEX", "VOEX", "CHEX", "VANNA FLOW"):
             axis = next(

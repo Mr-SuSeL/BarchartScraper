@@ -66,7 +66,7 @@ async def main(ticker="KC"):
     INTERVAL_SECONDS = INTERVAL_MINUTES * 60
 
     print("=" * 70)
-    print(" 🚀 OPTIONS MICROSTRUCTURE PIPELINE (LIVE UI)")
+    print(" 🚀 GREEKS ANALYTICS (LIVE UI)")
     print("=" * 70)
     print(f"Pętla pracuje w tle. Wykres będzie aktualizowany co {INTERVAL_MINUTES} minut.")
     print("Możesz swobodnie przybliżać/przesuwać okno wykresu.\n")

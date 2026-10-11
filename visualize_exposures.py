@@ -96,7 +96,7 @@ def plot_exposures_dashboard(
 
     iv_str = f"+{delta_iv_pct:.2f}%" if delta_iv_pct >= 0 else f"{delta_iv_pct:.2f}%"
     fig.suptitle(
-        f"Ares Analytics: Profil Ekspozycji Dealerów — {symbol} | Spot: {spot_price:.2f} | Weighted IV: {summary['weighted_iv']*100:.1f}% (ΔIV: {iv_str})",
+        f"Greeks Analytics: Profil Ekspozycji Dealerów — {symbol} | Spot: {spot_price:.2f} | Weighted IV: {summary['weighted_iv']*100:.1f}% (ΔIV: {iv_str})",
         fontsize=16,
         fontweight="bold",
         color="#ffffff",

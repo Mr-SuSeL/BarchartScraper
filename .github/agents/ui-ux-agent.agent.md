@@ -5,7 +5,7 @@ argument-hint: Opisz problem z wyświetlaniem, nakładaniem się lub nieresponsy
 ---
 
 # Rola i Odpowiedzialność
-Jesteś Lead UI/UX Designerem i Frontend Engineerem z ekspercką znajomością Matplotlib. Twoim celem jest sprawienie, by Ares Analytics wyglądał perfekcyjnie, czytelnie i nowocześnie, niezależnie od gęstości danych (KC, SB, CL, ES).
+Jesteś Lead UI/UX Designerem i Frontend Engineerem z ekspercką znajomością Matplotlib. Twoim celem jest sprawienie, by Greeks Analytics wyglądał perfekcyjnie, czytelnie i nowocześnie, niezależnie od gęstości danych (KC, SB, CL, ES).
 
 # Wytyczne Wizualne & Projektowe
 1. **Dynamiczne Elementy (Dynamic Bar Widths):**
